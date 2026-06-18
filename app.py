@@ -1,10 +1,15 @@
 import streamlit as st
+from api import get_all_flights,search_flight
+from components.metric import show_metrics
+from components.cards import flight_card
+
 
 st.set_page_config(
     page_title="SkyVi",
     page_icon="✈️",
     layout="wide"
 )
+data = get_all_flights()
 
 st.title("✈️ SkyVi")
 st.caption("Skyward Vision")
@@ -14,14 +19,7 @@ st.info(
 )
 
 st.divider()
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("🛫 Flights Tracked", "--")
-with col2:
-    st.metric("✈️ Aircraft", "--")
-with col3:
-    st.metric("🌍 Airports", "--")
+show_metrics(data)
 st.divider()
 
 st.subheader("🔍 Flight Search")
@@ -33,6 +31,11 @@ flight_number = st.text_input(
 
 if st.button("Track Flight"):
     if flight_number:
-        st.success(f"Searching live data for ✈️ {flight_number.upper()}...")
+        flight = search_flight(flight_number)
+        if flight:
+            st.success("✅ Flight Found!")
+            flight_card(flight)
+        else:
+            st.error("❌ Flight not found.")
     else:
         st.warning("Please enter a flight number.")
